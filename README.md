@@ -20,7 +20,8 @@ npm install
 npm run dev
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser
+3. Open [http://localhost:3001](http://localhost:3001) in your browser
+   - Note: If port 3001 is in use, the server will automatically try a different port. Check the terminal output for the actual URL.
 
 ## 📁 Project Structure
 
