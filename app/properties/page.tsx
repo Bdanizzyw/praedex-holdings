@@ -15,7 +15,7 @@ export default function PropertiesPage() {
   const [loading, setLoading] = useState(false)
   const [showNearMe, setShowNearMe] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'all' | 'properties' | 'hotels'>('all')
+  const [filter, setFilter] = useState<'all' | 'property' | 'hotel' | 'land' | 'shortlet'>('all')
 
   // Initialize with mock location (NYC center)
   useEffect(() => {
@@ -70,9 +70,8 @@ export default function PropertiesPage() {
   }
 
   const filteredItems = items.filter((item) => {
-    if (filter === 'properties') return item.type === 'property'
-    if (filter === 'hotels') return item.type === 'hotel'
-    return true
+    if (filter === 'all') return true
+    return item.type === filter
   })
 
   return (

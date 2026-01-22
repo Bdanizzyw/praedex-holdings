@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 interface PropertyCardProps {
   id: string
-  type: 'property' | 'hotel'
+  type: 'property' | 'hotel' | 'land' | 'shortlet'
   title: string
   price: number
   distance?: number
