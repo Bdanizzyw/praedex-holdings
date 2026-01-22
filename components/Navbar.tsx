@@ -13,6 +13,12 @@ export function Navbar() {
         </Link>
         <div className="flex gap-6">
           <Link
+            href="/map"
+            className="text-gray-700 hover:text-blue-600 font-medium transition"
+          >
+            🗺️ Map
+          </Link>
+          <Link
             href="/properties"
             className="text-gray-700 hover:text-blue-600 font-medium transition"
           >

@@ -233,4 +233,91 @@ export const propertiesAndHotels: Property[] = [
     rating: 4.8,
     reviews: 2750,
   },
+
+  // LAND
+  {
+    id: 'land-1',
+    type: 'land',
+    title: '🏞️ Commercial Land Plot',
+    price: 180000,
+    location: {
+      lat: 40.7505,
+      lng: -74.0072,
+      address: '100 Commercial Ave, Hudson Yards',
+    },
+    description:
+      'Prime commercial land in Hudson Yards perfect for development. High foot traffic area.',
+    sqft: 5000,
+    amenities: ['Zoning Ready', 'High Traffic', 'Infrastructure Ready'],
+    rating: 4.5,
+    reviews: 320,
+  },
+  {
+    id: 'land-2',
+    type: 'land',
+    title: '🏞️ Residential Land Development',
+    price: 250000,
+    location: {
+      lat: 40.7282,
+      lng: -73.7949,
+      address: '234 Development Way, Forest Hills',
+    },
+    description:
+      'Beautiful residential land for family development or investment. Great neighborhood.',
+    sqft: 8000,
+    amenities: ['Residential Zoned', 'Close to Schools', 'Parks Nearby'],
+    rating: 4.6,
+    reviews: 450,
+  },
+  {
+    id: 'land-3',
+    type: 'land',
+    title: '🏞️ Waterfront Development Land',
+    price: 520000,
+    location: {
+      lat: 40.5731,
+      lng: -73.9712,
+      address: '567 Waterfront Drive, Coney Island',
+    },
+    description:
+      'Premium waterfront land with development potential. Ocean views and access.',
+    sqft: 12000,
+    amenities: ['Waterfront Access', 'Development Ready', 'Scenic Views'],
+    rating: 4.9,
+    reviews: 680,
+  },
+  {
+    id: 'land-4',
+    type: 'land',
+    title: '🏞️ Industrial Lot',
+    price: 95000,
+    location: {
+      lat: 40.7614,
+      lng: -73.9776,
+      address: '789 Industrial Park, Red Hook',
+    },
+    description:
+      'Industrial land perfect for manufacturing or logistics. Near major highways.',
+    sqft: 15000,
+    amenities: ['Industrial Zoned', 'Highway Access', 'Utilities Available'],
+    rating: 4.2,
+    reviews: 220,
+  },
+  {
+    id: 'land-5',
+    type: 'land',
+    title: '🏞️ Agricultural Land',
+    price: 45000,
+    location: {
+      lat: 40.7165,
+      lng: -74.0043,
+      address: '100 Farm Road, Upstate',
+    },
+    description:
+      'Fertile agricultural land ideal for farming or eco-tourism projects.',
+    sqft: 20000,
+    amenities: ['Fertile Soil', 'Water Source', 'Sunlight'],
+    rating: 4.4,
+    reviews: 190,
+  },
 ]
