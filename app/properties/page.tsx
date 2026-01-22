@@ -1,41 +1,175 @@
-// Build a properties listing page using mock data.
-// Render a grid of PropertyCard components.
-// Include a simple heading "Properties Near You".
+'use client'
 
-import React from 'react'
+import { useEffect, useState } from 'react'
 import { PropertyCard } from '@/components/PropertyCard'
-
-const mockProperties = [
-  { id: '1', title: 'Luxury Downtown Apartment', price: 850000, distance: '2.5 km from city center' },
-  { id: '2', title: 'Suburban Family Home', price: 620000, distance: '15 km from city center' },
-  { id: '3', title: 'Modern Studio', price: 420000, distance: '1.2 km from city center' },
-  { id: '4', title: 'Executive Penthouse', price: 1200000, distance: '3 km from city center' },
-  { id: '5', title: 'Cozy Townhouse', price: 550000, distance: '8 km from city center' },
-  { id: '6', title: 'Beachfront Villa', price: 1500000, distance: '20 km from city center' },
-]
+import { propertiesAndHotels, Property } from '@/lib/data'
+import {
+  getUserLocation,
+  calculateDistance,
+  Coordinates,
+} from '@/lib/gpsService'
 
 export default function PropertiesPage() {
+  const [items, setItems] = useState<(Property & { distance?: number })[]>([])
+  const [userLocation, setUserLocation] = useState<Coordinates | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [showNearMe, setShowNearMe] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [filter, setFilter] = useState<'all' | 'properties' | 'hotels'>('all')
+
+  // Initialize with mock location (NYC center)
+  useEffect(() => {
+    setItems(propertiesAndHotels)
+    // Default to NYC coordinates for demo
+    setUserLocation({
+      latitude: 40.7128,
+      longitude: -74.006,
+    })
+  }, [])
+
+  const handleFindNearMe = async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const location = await getUserLocation()
+      setUserLocation(location)
+      setShowNearMe(true)
+
+      // Calculate distances for all items
+      const itemsWithDistance = propertiesAndHotels.map((item) => ({
+        ...item,
+        distance: calculateDistance(location, item.location),
+      }))
+
+      // Sort by distance
+      itemsWithDistance.sort((a, b) => (a.distance || 0) - (b.distance || 0))
+    } catch (err: any) {
+      setError(
+        err.message || 'Could not get your location. Please enable GPS.'
+      )
+      // Fallback: show all items with pre-calculated distances
+      const defaultLocation: Coordinates = {
+        latitude: 40.7128,
+        longitude: -74.006,
+      }
+      const itemsWithDistance = propertiesAndHotels.map((item) => ({
+        ...item,
+        distance: calculateDistance(defaultLocation, item.location),
+      }))
+      itemsWithDistance.sort((a, b) => (a.distance || 0) - (b.distance || 0))
+      setItems(itemsWithDistance)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGetDirections = (item: Property) => {
+    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${item.location.lat},${item.location.lng}&destination_place_id=${encodeURIComponent(item.title)}`
+    window.open(mapsUrl, '_blank')
+  }
+
+  const filteredItems = items.filter((item) => {
+    if (filter === 'properties') return item.type === 'property'
+    if (filter === 'hotels') return item.type === 'hotel'
+    return true
+  })
+
   return (
     <main>
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-2">Properties Near You</h1>
-          <p className="text-gray-600 mb-8">
-            Explore {mockProperties.length} verified investment properties
-          </p>
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold mb-2">
+              🏠 Properties & 🏨 Hotels Near You
+            </h1>
+            <p className="text-gray-600 text-lg mb-6">
+              Find the perfect property or hotel at the best locations
+            </p>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <button
+                onClick={handleFindNearMe}
+                disabled={loading}
+                className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-bold transition flex items-center gap-2"
+              >
+                {loading ? '🔍 Finding...' : '📍 Find Near Me'}
+              </button>
+
+              {userLocation && showNearMe && (
+                <div className="bg-blue-100 border border-blue-400 text-blue-800 px-4 py-2 rounded-lg">
+                  ✓ Showing results near your location
+                </div>
+              )}
+
+              {error && (
+                <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg">
+                  ⚠️ {error}
+                </div>
+              )}
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-4 py-2 rounded-lg font-semibold transition ${
+                  filter === 'all'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                All ({filteredItems.length})
+              </button>
+              <button
+                onClick={() => setFilter('properties')}
+                className={`px-4 py-2 rounded-lg font-semibold transition ${
+                  filter === 'properties'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                🏠 Properties ({items.filter((i) => i.type === 'property').length})
+              </button>
+              <button
+                onClick={() => setFilter('hotels')}
+                className={`px-4 py-2 rounded-lg font-semibold transition ${
+                  filter === 'hotels'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                🏨 Hotels ({items.filter((i) => i.type === 'hotel').length})
+              </button>
+            </div>
+          </div>
 
           {/* Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockProperties.map((property) => (
+            {filteredItems.map((item) => (
               <PropertyCard
-                key={property.id}
-                id={property.id}
-                title={property.title}
-                price={property.price}
-                distance={property.distance}
+                key={item.id}
+                id={item.id}
+                type={item.type}
+                title={item.title}
+                price={item.price}
+                distance={item.distance}
+                rating={item.rating}
+                reviews={item.reviews}
+                onDirections={() => handleGetDirections(item)}
               />
             ))}
           </div>
+
+          {filteredItems.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">
+                No {filter === 'all' ? 'items' : filter} found.
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </main>
