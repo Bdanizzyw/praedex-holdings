@@ -1,95 +1,150 @@
 'use client'
 
-import { useState } from 'react'
-import dynamic from 'next/dynamic'
-
-const InteractiveMap = dynamic(
-  () => import('@/components/InteractiveMap').then((mod) => ({ default: mod.InteractiveMap })),
-  { ssr: false }
-)
+import { useState, useEffect } from 'react'
+import { propertiesAndHotels, Property } from '@/lib/data'
+import { calculateDistance, Coordinates } from '@/lib/gpsService'
 
 export default function MapPage() {
-  const [filter, setFilter] = useState<'all' | 'properties' | 'hotels' | 'land'>('all')
+  const [filter, setFilter] = useState<'all' | 'property' | 'hotel' | 'land' | 'shortlet'>('all')
+  const [userLocation, setUserLocation] = useState<Coordinates>({
+    latitude: 40.7128,
+    longitude: -74.006,
+  })
+  const [nearbyItems, setNearbyItems] = useState<(Property & { distance?: number })[]>([])
+  const [selectedItem, setSelectedItem] = useState<Property | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  // Calculate nearby items on mount
+  useEffect(() => {
+    const itemsWithDistance = propertiesAndHotels.map((item) => ({
+      ...item,
+      distance: calculateDistance(userLocation, item.location),
+    }))
+
+    // Sort by distance
+    itemsWithDistance.sort((a, b) => (a.distance || 0) - (b.distance || 0))
+    setNearbyItems(itemsWithDistance)
+  }, [userLocation])
+
+  const filteredItems = nearbyItems.filter((item) => {
+    const matchesType = filter === 'all' || item.type === filter
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesType && matchesSearch
+  })
 
   return (
-    <main>
-      <section className="py-8 bg-white">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-2">🗺️ Live Map</h1>
-          <p className="text-gray-600 mb-6">
-            Discover available apartments, hotels, and land near your location in real-time
-          </p>
+    <main className="h-screen w-screen flex overflow-hidden">
+      {/* LEFT SIDE - Listings Panel (Like Uber) */}
+      <div className="w-full md:w-96 bg-white shadow-lg z-10 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="p-4 border-b">
+          <h1 className="text-2xl font-bold mb-4">Praedex Holdings</h1>
 
-          {/* Filter Buttons */}
-          <div className="flex gap-2 flex-wrap mb-6">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-lg font-semibold transition ${
-                filter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              All Listings
-            </button>
-            <button
-              onClick={() => setFilter('properties')}
-              className={`px-4 py-2 rounded-lg font-semibold transition ${
-                filter === 'properties'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              🏠 Apartments
-            </button>
-            <button
-              onClick={() => setFilter('hotels')}
-              className={`px-4 py-2 rounded-lg font-semibold transition ${
-                filter === 'hotels'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              🏨 Hotels
-            </button>
-            <button
-              onClick={() => setFilter('land')}
-              className={`px-4 py-2 rounded-lg font-semibold transition ${
-                filter === 'land'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              🏞️ Land
-            </button>
-          </div>
+          {/* Search Bar */}
+          <input
+            type="text"
+            placeholder="Search properties, hotels, land..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 mb-3"
+          />
 
-          {/* Map */}
-          <InteractiveMap filter={filter} />
-
-          {/* Legend */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-bold mb-3">📍 Map Legend</h3>
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-blue-500 rounded-full"></div>
-                <span>🏠 Apartments</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-purple-500 rounded-full"></div>
-                <span>🏨 Hotels</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-green-500 rounded-full"></div>
-                <span>🏞️ Land</span>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mt-3">
-              💡 Click on any marker to see details and available amenities
-            </p>
+          {/* Filter Tabs */}
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {[
+              { id: 'all', label: 'All', icon: '📍' },
+              { id: 'property', label: '🏠 Apt', icon: '🏠' },
+              { id: 'hotel', label: '🏨 Hotel', icon: '🏨' },
+              { id: 'shortlet', label: '🏢 Short', icon: '🏢' },
+              { id: 'land', label: '🏞️ Land', icon: '🏞️' },
+            ].map((btn) => (
+              <button
+                key={btn.id}
+                onClick={() => setFilter(btn.id as any)}
+                className={`px-3 py-2 rounded-lg font-semibold whitespace-nowrap transition ${
+                  filter === btn.id
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {btn.label}
+              </button>
+            ))}
           </div>
         </div>
-      </section>
+
+        {/* Listings */}
+        <div className="flex-1 overflow-y-auto">
+          {filteredItems.length === 0 ? (
+            <div className="p-4 text-center text-gray-500">
+              No results found
+            </div>
+          ) : (
+            filteredItems.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => setSelectedItem(item)}
+                className={`p-4 border-b cursor-pointer transition hover:bg-gray-50 ${
+                  selectedItem?.id === item.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
+                }`}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-bold text-sm flex-1">{item.title}</h3>
+                  <span className="text-xs bg-gray-200 px-2 py-1 rounded">
+                    {item.distance?.toFixed(1)}km
+                  </span>
+                </div>
+
+                <p className="text-gray-600 text-xs mb-2">{item.location.address}</p>
+
+                <div className="flex justify-between items-center">
+                  <p className="font-bold text-blue-600">
+                    ${item.price.toLocaleString()}
+                    {item.type === 'hotel' || item.type === 'shortlet' ? '/night' : ''}
+                  </p>
+                  {item.rating && (
+                    <span className="text-xs text-yellow-500">⭐ {item.rating}</span>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* RIGHT SIDE - Map Placeholder */}
+      <div className="hidden md:flex flex-1 bg-gradient-to-br from-blue-100 to-purple-100 items-center justify-center relative">
+        {/* Map Background */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-6xl mb-4">🗺️</div>
+            <p className="text-gray-600 text-lg">Interactive Map</p>
+            <p className="text-gray-500 text-sm mt-2">Leaflet map loads here</p>
+          </div>
+        </div>
+
+        {/* Selected Item Info Card */}
+        {selectedItem && (
+          <div className="absolute bottom-6 right-6 bg-white rounded-lg shadow-lg p-4 w-80">
+            <h3 className="font-bold text-lg mb-2">{selectedItem.title}</h3>
+            <p className="text-gray-600 text-sm mb-2">{selectedItem.location.address}</p>
+            <p className="text-blue-600 font-bold mb-2">
+              ${selectedItem.price.toLocaleString()}
+              {selectedItem.type === 'hotel' || selectedItem.type === 'shortlet' ? '/night' : ''}
+            </p>
+            <p className="text-gray-700 text-sm mb-3">{selectedItem.description}</p>
+
+            <div className="flex gap-2">
+              <button className="flex-1 bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700">
+                📍 Directions
+              </button>
+              <button className="flex-1 bg-green-600 text-white py-2 rounded font-semibold hover:bg-green-700">
+                📞 Call
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </main>
   )
 }

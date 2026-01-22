@@ -1,8 +1,8 @@
-// Combined data file with properties AND hotels with GPS coordinates
+// Combined data file with properties, hotels, land, and shortlets with GPS coordinates
 
 export interface Property {
   id: string
-  type: 'property' | 'hotel'
+  type: 'property' | 'hotel' | 'land' | 'shortlet'
   title: string
   price: number
   location: {
@@ -232,6 +232,98 @@ export const propertiesAndHotels: Property[] = [
     amenities: ['Beach', 'Water Sports', 'Restaurant', 'Pool'],
     rating: 4.8,
     reviews: 2750,
+  },
+
+  // SHORTLETS (Short-term Rentals)
+  {
+    id: 'short-1',
+    type: 'shortlet',
+    title: '🏠 Cozy Brooklyn Shortlet',
+    price: 85,
+    location: {
+      lat: 40.6501,
+      lng: -73.9496,
+      address: '123 Bedford Ave, Brooklyn',
+    },
+    description:
+      'Beautiful 1-bedroom shortlet in trendy Brooklyn. Perfect for short stays.',
+    bedrooms: 1,
+    bathrooms: 1,
+    amenities: ['WiFi', 'Kitchen', 'Washer/Dryer'],
+    rating: 4.7,
+    reviews: 420,
+  },
+  {
+    id: 'short-2',
+    type: 'shortlet',
+    title: '🏠 Manhattan Studio Shortlet',
+    price: 120,
+    location: {
+      lat: 40.7505,
+      lng: -73.9934,
+      address: '456 5th Ave, Gramercy',
+    },
+    description:
+      'Modern studio in Manhattan with great views. Ideal for business travelers.',
+    bedrooms: 1,
+    bathrooms: 1,
+    amenities: ['WiFi', 'TV', 'Kitchenette'],
+    rating: 4.6,
+    reviews: 580,
+  },
+  {
+    id: 'short-3',
+    type: 'shortlet',
+    title: '🏠 Queens Family Shortlet',
+    price: 95,
+    location: {
+      lat: 40.7282,
+      lng: -73.7949,
+      address: '789 Family Lane, Forest Hills',
+    },
+    description:
+      'Spacious 2-bedroom shortlet perfect for families. Close to parks and schools.',
+    bedrooms: 2,
+    bathrooms: 1.5,
+    amenities: ['WiFi', 'Kitchen', 'Living Room'],
+    rating: 4.8,
+    reviews: 340,
+  },
+  {
+    id: 'short-4',
+    type: 'shortlet',
+    title: '🏠 East Village Luxury Shortlet',
+    price: 150,
+    location: {
+      lat: 40.7294,
+      lng: -73.9829,
+      address: '321 East Village Rd, East Village',
+    },
+    description:
+      'High-end luxury shortlet in vibrant East Village. Great nightlife nearby.',
+    bedrooms: 2,
+    bathrooms: 2,
+    amenities: ['WiFi', 'AC', 'Premium Bedding'],
+    rating: 4.9,
+    reviews: 670,
+  },
+  {
+    id: 'short-5',
+    type: 'shortlet',
+    title: '🏠 Upper West Side Shortlet',
+    price: 110,
+    location: {
+      lat: 40.7505,
+      lng: -74.0072,
+      address: '555 Central Park West, Upper West Side',
+    },
+    description:
+      'Beautiful shortlet with views of Central Park. Perfect location for tourists.',
+    bedrooms: 1,
+    bathrooms: 1,
+    amenities: ['WiFi', 'Park View', 'Doorman'],
+    rating: 4.7,
+    reviews: 520,
   },
 
   // LAND
