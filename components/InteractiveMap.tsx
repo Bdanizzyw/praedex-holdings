@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { Property, propertiesAndHotels } from '@/lib/data'
-import { Coordinates } from '@/lib/gpsService'
+import { propertiesAndHotels } from '@/lib/data'
 
 const MapComponent = dynamic(
-  () => import('./MapComponent'),
+  () => import('./MapComponent').then((mod) => mod.default),
   { ssr: false, loading: () => <div className="h-96 bg-gray-200 flex items-center justify-center">Loading map...</div> }
 )
 
