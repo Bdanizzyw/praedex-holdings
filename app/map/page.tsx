@@ -1,13 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import dynamic from 'next/dynamic'
-
-// Dynamically import the map component to avoid SSR issues
-const InteractiveMap = dynamic(
-  () => import('@/components/InteractiveMap').then((mod) => ({ default: mod.InteractiveMap })),
-  { ssr: false, loading: () => <div className="h-96 bg-gray-200 flex items-center justify-center">Loading map...</div> }
-)
+import { InteractiveMap } from '@/components/InteractiveMap'
 
 export default function MapPage() {
   const [filter, setFilter] = useState<'all' | 'properties' | 'hotels' | 'land'>('all')
