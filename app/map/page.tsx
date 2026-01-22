@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'
 
 const InteractiveMap = dynamic(
   () => import('@/components/InteractiveMap').then((mod) => ({ default: mod.InteractiveMap })),
-  { ssr: false, loading: () => <div className="h-96 bg-gray-200 flex items-center justify-center">Loading map...</div> }
+  { ssr: false }
 )
 
 export default function MapPage() {

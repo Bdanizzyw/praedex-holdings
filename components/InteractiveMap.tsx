@@ -1,27 +1,72 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
-import { propertiesAndHotels } from '@/lib/data'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { LatLngExpression, icon } from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import { propertiesAndHotels, Property } from '@/lib/data'
+import { getUserLocation } from '@/lib/gpsService'
 
-const MapComponent = dynamic(
-  () => import('./MapComponent').then((mod) => mod.default),
-  { ssr: false, loading: () => <div className="h-96 bg-gray-200 flex items-center justify-center">Loading map...</div> }
-)
+const propertyIcon = icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-blue.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+})
+
+const hotelIcon = icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-purple.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+})
+
+const landIcon = icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+})
 
 interface InteractiveMapProps {
   filter: 'all' | 'properties' | 'hotels' | 'land'
 }
 
 export function InteractiveMap({ filter }: InteractiveMapProps) {
+  const [userLocation, setUserLocation] = useState<LatLngExpression>([40.7128, -74.006])
+  const [loading, setLoading] = useState(true)
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)
+    const getLocation = async () => {
+      try {
+        const location = await getUserLocation()
+        setUserLocation([location.latitude, location.longitude])
+      } catch (err) {
+        console.log('Using default NYC coordinates')
+      } finally {
+        setLoading(false)
+      }
+    }
+    getLocation()
   }, [])
 
-  if (!isMounted) {
-    return <div className="h-96 bg-gray-200 flex items-center justify-center">Loading map...</div>
+  const getIcon = (type: string) => {
+    switch (type) {
+      case 'hotel':
+        return hotelIcon
+      case 'land':
+        return landIcon
+      default:
+        return propertyIcon
+    }
   }
 
   const filteredItems = propertiesAndHotels.filter((item) => {
@@ -29,5 +74,40 @@ export function InteractiveMap({ filter }: InteractiveMapProps) {
     return item.type === filter
   })
 
-  return <MapComponent items={filteredItems} />
+  if (!isMounted || loading) {
+    return (
+      <div className="w-full h-96 bg-gray-200 flex items-center justify-center rounded-lg">
+        <p className="text-gray-600">Loading map...</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-full rounded-lg overflow-hidden shadow-lg">
+      <MapContainer center={userLocation} zoom={13} style={{ height: '500px', width: '100%' }} scrollWheelZoom={true}>
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
+
+        <Marker position={userLocation} icon={propertyIcon}>
+          <Popup>
+            <div className="font-bold">📍 Your Location</div>
+          </Popup>
+        </Marker>
+
+        {filteredItems.map((item) => (
+          <Marker key={item.id} position={[item.location.lat, item.location.lng]} icon={getIcon(item.type)}>
+            <Popup>
+              <div className="w-56">
+                <h3 className="font-bold text-sm mb-1">{item.title}</h3>
+                <p className="text-xs text-gray-600 mb-2">{item.location.address}</p>
+                <p className="font-bold text-blue-600 mb-2">${item.price.toLocaleString()}</p>
+                {item.rating && <p className="text-xs text-yellow-500 mb-2">⭐ {item.rating} ({item.reviews} reviews)</p>}
+                <p className="text-xs text-gray-700">{item.description}</p>
+                <button className="mt-2 w-full bg-blue-600 text-white py-1 rounded text-xs font-semibold hover:bg-blue-700">View Details</button>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    </div>
+  )
 }
