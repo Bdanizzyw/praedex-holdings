@@ -43,7 +43,7 @@ export default function MapPage() {
           {/* Search Bar */}
           <input
             type="text"
-            placeholder="Search properties, hotels, land..."
+            placeholder="Find apartment, hotel, land, shortlet..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 mb-3"
@@ -135,10 +135,16 @@ export default function MapPage() {
             <p className="text-gray-700 text-sm mb-3">{selectedItem.description}</p>
 
             <div className="flex gap-2">
-              <button className="flex-1 bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700">
+              <button 
+                onClick={() => {
+                  const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(selectedItem.location.address)}/@${selectedItem.location.lat},${selectedItem.location.lng},15z`
+                  window.open(mapsUrl, '_blank')
+                }}
+                className="flex-1 bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition"
+              >
                 📍 Directions
               </button>
-              <button className="flex-1 bg-green-600 text-white py-2 rounded font-semibold hover:bg-green-700">
+              <button className="flex-1 bg-green-600 text-white py-2 rounded font-semibold hover:bg-green-700 transition">
                 📞 Call
               </button>
             </div>
