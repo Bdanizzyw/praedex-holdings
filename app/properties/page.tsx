@@ -123,9 +123,9 @@ export default function PropertiesPage() {
                 All ({filteredItems.length})
               </button>
               <button
-                onClick={() => setFilter('properties')}
+                onClick={() => setFilter('property')}
                 className={`px-4 py-2 rounded-lg font-semibold transition ${
-                  filter === 'properties'
+                  filter === 'property'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
@@ -133,9 +133,9 @@ export default function PropertiesPage() {
                 🏠 Properties ({items.filter((i) => i.type === 'property').length})
               </button>
               <button
-                onClick={() => setFilter('hotels')}
+                onClick={() => setFilter('hotel')}
                 className={`px-4 py-2 rounded-lg font-semibold transition ${
-                  filter === 'hotels'
+                  filter === 'hotel'
                     ? 'bg-purple-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
