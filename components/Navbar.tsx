@@ -14,19 +14,19 @@ export function Navbar() {
         <div className="flex gap-6">
           <Link
             href="/map"
-            className="text-gray-700 hover:text-blue-600 font-medium transition"
+            className="text-gray-700 hover:text-blue-600 hover:border-b-2 hover:border-blue-600 font-medium transition pb-1"
           >
             🗺️ Map
           </Link>
           <Link
             href="/properties"
-            className="text-gray-700 hover:text-blue-600 font-medium transition"
+            className="text-gray-700 hover:text-blue-600 hover:border-b-2 hover:border-blue-600 font-medium transition pb-1"
           >
             Properties
           </Link>
           <Link
             href="/list"
-            className="text-gray-700 hover:text-blue-600 font-medium transition"
+            className="text-gray-700 hover:text-blue-600 hover:border-b-2 hover:border-blue-600 font-medium transition pb-1"
           >
             List Property
           </Link>
