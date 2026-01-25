@@ -214,12 +214,15 @@ export default function MapPage() {
               </div>
             </div>
 
-            {/* Address and Distance */}
-            <div className="mb-3 text-sm">
-              <p className="text-gray-600">📍 {selectedItem.location.address}</p>
-              <p className="text-blue-600 font-bold mt-1">{selectedItem.distance?.toFixed(1)}km away</p>
-            </div>
-
+         {/* Address and Distance */}
+<div className="mb-3 text-sm">
+  <p className="text-gray-600">📍 {selectedItem.location.address}</p>
+  {selectedItem.distance !== undefined && (
+    <p className="text-blue-600 font-bold mt-1">
+      {selectedItem.distance.toFixed(1)}km away
+    </p>
+  )}
+</div>
             {/* Price and Rating */}
             <div className="flex justify-between items-center mb-3 pb-3 border-b">
               <p className="font-bold text-lg text-blue-600">

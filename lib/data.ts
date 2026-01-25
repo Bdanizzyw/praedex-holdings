@@ -1,6 +1,9 @@
+
 // Combined data file with properties, hotels, land, and shortlets with GPS coordinates
 
 export interface Property {
+  // distance is usually computed later (e.g., from user location), so make it optional and typed
+  distance?: number
   id: string
   type: 'property' | 'hotel' | 'land' | 'shortlet'
   title: string
